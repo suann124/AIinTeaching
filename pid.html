@@ -1,0 +1,819 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Lecture 1: (PID) Control &#8212; Interactive Control Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/chat.css?v=16a4e30f" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'pid';</script>
+    <script src="_static/inverted-pendulum.js?v=e453125a"></script>
+    <script src="_static/chat.js?v=2af54417"></script>
+    <script src="_static/fixed-simulation.js?v=1c732286"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Interactive PID Simulation" href="simulation.html" />
+    <link rel="prev" title="🚀 Student Guide" href="student-guide.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Interactive Control Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    🎯 Introduction
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="student-guide.html">🚀 Student Guide</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lecture 1: (PID) Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulation.html">Interactive PID Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Further Reading</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/suann124/AIinTeaching/main?urlpath=lab/tree/./pid.md" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/pid.ipynb" target="_blank"
+   class="btn btn-sm btn-download-notebook-button dropdown-item"
+   title="Download notebook file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="_sources/pid.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lecture 1: (PID) Control</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-loop-and-the-error-signal">1. Feedback loop and the error signal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pid-law-time-and-laplace-domains">2. PID law (time and Laplace domains)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#closed-loop-transfer-functions">3. Closed-loop transfer functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-pid-derivative-filtering-and-anti-windup">4. Practical PID: derivative filtering and anti-windup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-time-implementation-ready-to-run">5. Discrete-time implementation (ready to run)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant-no-scipy-needed">6. Worked example: first-order plant (no SciPy needed)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">7. A simple manual tuning recipe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">8. Discrete PID you can paste into projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">9. Common pitfalls (and quick fixes)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="lecture-1-pid-control">
+<span id="pid"></span><h1>Lecture 1: (PID) Control<a class="headerlink" href="#lecture-1-pid-control" title="Link to this heading">#</a></h1>
+<div class="tip admonition">
+<p class="admonition-title">What you will learn</p>
+<ul class="simple">
+<li><p>The standard feedback loop and what <strong>P</strong>, <strong>I</strong>, <strong>D</strong> terms do</p></li>
+<li><p>Time- and Laplace-domain forms of PID</p></li>
+<li><p>Closed-loop transfer functions and basic performance intuition</p></li>
+<li><p>Practical <strong>derivative filtering</strong> and <strong>anti-windup</strong></p></li>
+<li><p>Discrete-time implementation you can run in Python</p></li>
+<li><p>A sane, step-by-step <strong>manual tuning</strong> recipe (+ Ziegler–Nichols option)</p></li>
+</ul>
+</div>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p><strong>Original slides</strong>: <a class="reference download internal" download="" href="_downloads/a78851ec228cb70f242f7f4d7690c67a/pid.pdf"><code class="xref download docutils literal notranslate"><span class="pre">PID</span> <span class="pre">lecture</span> <span class="pre">PDF</span></code></a><br />
+The PDF is embedded below for quick reference.</p>
+</aside>
+<object data="_static/pid.pdf" type="application/pdf" width="100%" height="520px">
+  <p>PDF preview unavailable. <a href="_static/pid.pdf">Open the PDF.</a></p>
+</object><hr class="docutils" />
+<section id="feedback-loop-and-the-error-signal">
+<h2>1. Feedback loop and the error signal<a class="headerlink" href="#feedback-loop-and-the-error-signal" title="Link to this heading">#</a></h2>
+<p>We regulate plant output <span class="math notranslate nohighlight">\(y(t)\)</span> to follow a reference <span class="math notranslate nohighlight">\(r(t)\)</span>.
+The <strong>error</strong> is</p>
+<div class="math notranslate nohighlight">
+\[e(t) = r(t) - y(t).\]</div>
+<p>A controller computes the control input <span class="math notranslate nohighlight">\(u(t)\)</span> from <span class="math notranslate nohighlight">\(e(t)\)</span>. With unity
+feedback the closed-loop block diagram is:</p>
+<figure class="align-center" id="fig-pid-block">
+<img alt="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=Reference+--&gt;(+)+--+--&gt;+Controller+--&gt;+Plant+--&gt;+y(t);+(-)+feedback" src="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=Reference+--&gt;(+)+--+--&gt;+Controller+--&gt;+Plant+--&gt;+y(t);+(-)+feedback" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">A standard unity-feedback loop: the controller acts on the error <span class="math notranslate nohighlight">\(e=r-y\)</span>.</span><a class="headerlink" href="#fig-pid-block" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<hr class="docutils" />
+<section id="pid-law-time-and-laplace-domains">
+<h2>2. PID law (time and Laplace domains)<a class="headerlink" href="#pid-law-time-and-laplace-domains" title="Link to this heading">#</a></h2>
+<p>The continuous-time PID law is</p>
+<div class="math notranslate nohighlight">
+\[u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d\frac{de}{dt}(t).\]</div>
+<p>In Laplace domain (assuming zero initial conditions):</p>
+<div class="math notranslate nohighlight">
+\[U(s) = \left(K_p + \frac{K_i}{s} + K_d s\right) E(s) = G_c(s)E(s),\]</div>
+<p>with controller transfer function</p>
+<div class="math notranslate nohighlight">
+\[G_c(s) = K_p + \frac{K_i}{s} + K_d s.\]</div>
+<p><strong>Intuition</strong></p>
+<ul class="simple">
+<li><p><strong>P</strong> reacts to present error → faster response, but too large <span class="math notranslate nohighlight">\(K_p\)</span> can cause overshoot/instability.</p></li>
+<li><p><strong>I</strong> removes steady-state error (adds a pole at 0) → improves tracking of steps/ramps, but can slow response and cause windup.</p></li>
+<li><p><strong>D</strong> predicts/”brakes” fast changes → reduces overshoot and improves damping, but is noise-sensitive.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="closed-loop-transfer-functions">
+<h2>3. Closed-loop transfer functions<a class="headerlink" href="#closed-loop-transfer-functions" title="Link to this heading">#</a></h2>
+<p>For plant <span class="math notranslate nohighlight">\(G_p(s)\)</span> and controller <span class="math notranslate nohighlight">\(G_c(s)\)</span> with unity feedback,</p>
+<div class="math notranslate nohighlight">
+\[T(s) \equiv \frac{Y(s)}{R(s)} = \frac{G_c(s)G_p(s)}{1 + G_c(s)G_p(s)}, \quad
+S(s) \equiv \frac{E(s)}{R(s)} = \frac{1}{1+G_c(s)G_p(s)}.\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(T(s)\)</span> is the <strong>complementary sensitivity</strong> (reference→output).</p></li>
+<li><p><span class="math notranslate nohighlight">\(S(s)\)</span> is the <strong>sensitivity</strong> (reference→error, and also output’s sensitivity to plant/model errors).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="practical-pid-derivative-filtering-and-anti-windup">
+<h2>4. Practical PID: derivative filtering and anti-windup<a class="headerlink" href="#practical-pid-derivative-filtering-and-anti-windup" title="Link to this heading">#</a></h2>
+<p><strong>Derivative filtering.</strong> Use a first-order filter to avoid amplifying sensor noise:</p>
+<div class="math notranslate nohighlight">
+\[G_d(s) = \frac{K_d s}{1 + \tau_d s}, \quad \text{so } G_c(s) = K_p + \frac{K_i}{s} + \frac{K_d s}{1 + \tau_d s}.\]</div>
+<p>Typical <span class="math notranslate nohighlight">\(\tau_d\)</span> is small (e.g., <span class="math notranslate nohighlight">\(\tau_d = K_d / N\)</span> with <span class="math notranslate nohighlight">\(N \in [5,20]\)</span>).</p>
+<p><strong>Actuator saturation &amp; integral windup.</strong> If <span class="math notranslate nohighlight">\(u\)</span> saturates (e.g., <span class="math notranslate nohighlight">\(|u| \le u_{\max}\)</span>), the integrator can accumulate error and cause slow recovery.
+A common <strong>back-calculation</strong> anti-windup is</p>
+<div class="math notranslate nohighlight">
+\[\dot{x}_I = e + \frac{u_\text{sat}-u_\text{raw}}{T_\text{aw}},\]</div>
+<p>where <span class="math notranslate nohighlight">\(x_I\)</span> is the integrator state, <span class="math notranslate nohighlight">\(u_{\text{raw}}\)</span> the unclipped control, and <span class="math notranslate nohighlight">\(u_{\text{sat}}\)</span> the saturated control.
+<span class="math notranslate nohighlight">\(T_\text{aw}\)</span> tunes how aggressively the integrator is “unwound”.</p>
+</section>
+<hr class="docutils" />
+<section id="discrete-time-implementation-ready-to-run">
+<h2>5. Discrete-time implementation (ready to run)<a class="headerlink" href="#discrete-time-implementation-ready-to-run" title="Link to this heading">#</a></h2>
+<p>Let sampling time be <span class="math notranslate nohighlight">\(\Delta t\)</span>. A robust direct form uses the <strong>trapezoidal (Tustin)</strong> integral and a filtered derivative:</p>
+<p><strong>Integral update (trapezoidal):</strong></p>
+<div class="math notranslate nohighlight">
+\[x_I[k] = x_I[k-1] + \frac{\Delta t}{2}(e[k] + e[k-1])\]</div>
+<p><strong>Filtered derivative:</strong></p>
+<div class="math notranslate nohighlight">
+\[d[k] = \alpha d[k-1] + (1-\alpha)\frac{e[k]-e[k-1]}{\Delta t}, \quad \alpha=\frac{\tau_d}{\tau_d+\Delta t}\]</div>
+<p><strong>PID output:</strong></p>
+<div class="math notranslate nohighlight">
+\[u_\text{raw}[k] = K_p e[k] + K_i x_I[k] + K_d d[k]\]</div>
+<p><strong>Saturation:</strong></p>
+<div class="math notranslate nohighlight">
+\[u[k] = \text{clip}(u_\text{raw}[k], u_{\min}, u_{\max})\]</div>
+<p><strong>Anti-windup back-calculation:</strong></p>
+<div class="math notranslate nohighlight">
+\[x_I[k] \mathrel{+}= \frac{u[k]-u_\text{raw}[k]}{T_\text{aw}}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pid_discrete</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">Kp</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">Ki</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">Kd</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                 <span class="n">tau_d</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">umin</span><span class="o">=-</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">Taw</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One PID update with filtered D and back-calculation anti-windup.</span>
+<span class="sd">    st = dict(integ, prev_e, d_filt)</span>
+<span class="sd">    Returns (u, st)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">integ</span><span class="p">,</span> <span class="n">prev_e</span><span class="p">,</span> <span class="n">d_filt</span> <span class="o">=</span> <span class="n">st</span><span class="p">[</span><span class="s2">&quot;integ&quot;</span><span class="p">],</span> <span class="n">st</span><span class="p">[</span><span class="s2">&quot;prev_e&quot;</span><span class="p">],</span> <span class="n">st</span><span class="p">[</span><span class="s2">&quot;d_filt&quot;</span><span class="p">]</span>
+
+    <span class="c1"># trapezoidal integral</span>
+    <span class="n">integ</span> <span class="o">=</span> <span class="n">integ</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="n">e</span> <span class="o">+</span> <span class="n">prev_e</span><span class="p">)</span>
+
+    <span class="c1"># filtered derivative</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">tau_d</span><span class="o">/</span><span class="p">(</span><span class="n">tau_d</span> <span class="o">+</span> <span class="n">dt</span><span class="p">)</span> <span class="k">if</span> <span class="n">tau_d</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">d_raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">-</span> <span class="n">prev_e</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span> <span class="k">if</span> <span class="n">dt</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">d_filt</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">d_filt</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span><span class="o">*</span><span class="n">d_raw</span>
+
+    <span class="n">u_raw</span> <span class="o">=</span> <span class="n">Kp</span><span class="o">*</span><span class="n">e</span> <span class="o">+</span> <span class="n">Ki</span><span class="o">*</span><span class="n">integ</span> <span class="o">+</span> <span class="n">Kd</span><span class="o">*</span><span class="n">d_filt</span>
+
+    <span class="c1"># saturation and anti-windup</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">umin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">umax</span><span class="p">,</span> <span class="n">u_raw</span><span class="p">))</span>
+    <span class="n">integ</span> <span class="o">+=</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">u_raw</span><span class="p">)</span><span class="o">/</span><span class="n">Taw</span>  <span class="c1"># back-calculation</span>
+
+    <span class="n">st</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;integ&quot;</span><span class="p">:</span> <span class="n">integ</span><span class="p">,</span> <span class="s2">&quot;prev_e&quot;</span><span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s2">&quot;d_filt&quot;</span><span class="p">:</span> <span class="n">d_filt</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">st</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="worked-example-first-order-plant-no-scipy-needed">
+<h2>6. Worked example: first-order plant (no SciPy needed)<a class="headerlink" href="#worked-example-first-order-plant-no-scipy-needed" title="Link to this heading">#</a></h2>
+<p>Consider <span class="math notranslate nohighlight">\(x_{k+1} = x_k + \Delta t [a (u_k - x_k)]\)</span><br />
+(a leaky bucket / first-order lag with rate <span class="math notranslate nohighlight">\(a\)</span>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_pid_first_order</span><span class="p">(</span><span class="n">Kp</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">Ki</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">Kd</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                             <span class="n">ref</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">tau_d</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">umin</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">Taw</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="n">dt</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;integ&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;prev_e&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;d_filt&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+    <span class="n">xs</span><span class="p">,</span> <span class="n">us</span><span class="p">,</span> <span class="n">es</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">dt</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">ref</span> <span class="o">-</span> <span class="n">x</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">st</span> <span class="o">=</span> <span class="n">pid_discrete</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tau_d</span><span class="p">,</span> <span class="n">umin</span><span class="p">,</span> <span class="n">umax</span><span class="p">,</span> <span class="n">Taw</span><span class="p">)</span>
+        <span class="c1"># plant update</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">x</span><span class="p">))</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">);</span> <span class="n">us</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">);</span> <span class="n">es</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">);</span> <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">us</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">es</span><span class="p">)</span>
+
+<span class="n">ts</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">us</span><span class="p">,</span> <span class="n">es</span> <span class="o">=</span> <span class="n">simulate_pid_first_order</span><span class="p">()</span>
+<span class="nb">float</span><span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">us</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(0.771896401117652, 0.7779050672376774)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot (matplotlib is available in most Jupyter installs)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;x (output)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;reference&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time [s]&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Step response with PID&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">us</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;u (control)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time [s]&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Control effort (with saturation)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/da80298111d878cd6df932eac9e9b45dff58f247a0eb9b49fe171a5d2b6e1c59.png" src="_images/da80298111d878cd6df932eac9e9b45dff58f247a0eb9b49fe171a5d2b6e1c59.png" />
+<img alt="_images/fd2badc1893b87c46bced7e74d40b0b3c2a711efe078e5e99baad0354adb9023.png" src="_images/fd2badc1893b87c46bced7e74d40b0b3c2a711efe078e5e99baad0354adb9023.png" />
+</div>
+</div>
+<p><strong>Try this:</strong> increase <span class="math notranslate nohighlight">\(K_p\)</span> (faster but overshoot), add <span class="math notranslate nohighlight">\(K_d\)</span> (damps overshoot), then raise <span class="math notranslate nohighlight">\(K_i\)</span> (remove any residual bias, watch for windup).</p>
+</section>
+<hr class="docutils" />
+<section id="a-simple-manual-tuning-recipe">
+<h2>7. A simple manual tuning recipe<a class="headerlink" href="#a-simple-manual-tuning-recipe" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Start conservative.</strong> Set <span class="math notranslate nohighlight">\(K_i = 0\)</span>, <span class="math notranslate nohighlight">\(K_d = 0\)</span>. Increase <span class="math notranslate nohighlight">\(K_p\)</span> until the output responds quickly but without sustained oscillation.</p></li>
+<li><p><strong>Add derivative.</strong> Increase <span class="math notranslate nohighlight">\(K_d\)</span> to reduce overshoot/oscillation; tune <span class="math notranslate nohighlight">\(\tau_d\)</span> so derivative is smooth (e.g., <span class="math notranslate nohighlight">\(\tau_d \approx 5\Delta t\)</span>).</p></li>
+<li><p><strong>Add integral.</strong> Increase <span class="math notranslate nohighlight">\(K_i\)</span> to eliminate steady-state error; if it oscillates or recovers slowly after saturation, reduce <span class="math notranslate nohighlight">\(K_i\)</span> or lower <span class="math notranslate nohighlight">\(T_{\text{aw}}\)</span>.</p></li>
+<li><p><strong>Check saturation.</strong> Ensure your actuator limits are realistic and anti-windup behaves (no long “stuck at limit” recovery).</p></li>
+</ol>
+<p><strong>Ziegler–Nichols (classic)</strong> (optional): set <span class="math notranslate nohighlight">\(K_i = K_d = 0\)</span>, increase <span class="math notranslate nohighlight">\(K_p\)</span> to the <strong>ultimate gain</strong> <span class="math notranslate nohighlight">\(K_u\)</span> where output sustains oscillation; note period <span class="math notranslate nohighlight">\(P_u\)</span>. Then</p>
+<ul class="simple">
+<li><p>P: <span class="math notranslate nohighlight">\(K_p = 0.5K_u\)</span></p></li>
+<li><p>PI: <span class="math notranslate nohighlight">\(K_p = 0.45K_u, \quad K_i = 1.2K_p/P_u\)</span></p></li>
+<li><p>PID: <span class="math notranslate nohighlight">\(K_p = 0.6K_u, \quad K_i = 2K_p/P_u, \quad K_d = K_pP_u/8\)</span><br />
+These are aggressive; back off for robustness.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="discrete-pid-you-can-paste-into-projects">
+<h2>8. Discrete PID you can paste into projects<a class="headerlink" href="#discrete-pid-you-can-paste-into-projects" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PID</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Kp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Ki</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Kd</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">tau_d</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                 <span class="n">umin</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">Taw</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ki</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span> <span class="o">=</span> <span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_d</span> <span class="o">=</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tau_d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">umin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">umax</span> <span class="o">=</span> <span class="n">umin</span><span class="p">,</span> <span class="n">umax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Taw</span> <span class="o">=</span> <span class="n">Taw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integ</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_e</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_filt</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+        <span class="c1"># integral (trapezoid)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integ</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="n">e</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_e</span><span class="p">)</span>
+        <span class="c1"># derivative (filtered)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_d</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_d</span> <span class="o">+</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">d_raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_e</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d_filt</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">d_filt</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">*</span><span class="n">d_raw</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d_filt</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_e</span><span class="p">)</span><span class="o">/</span><span class="n">dt</span>
+        <span class="n">u_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kp</span><span class="o">*</span><span class="n">e</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ki</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">integ</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kd</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">d_filt</span>
+        <span class="c1"># saturation + anti-windup</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">umin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">umax</span><span class="p">,</span> <span class="n">u_raw</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integ</span> <span class="o">+=</span> <span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">u_raw</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Taw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_e</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="k">return</span> <span class="n">u</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="common-pitfalls-and-quick-fixes">
+<h2>9. Common pitfalls (and quick fixes)<a class="headerlink" href="#common-pitfalls-and-quick-fixes" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Noisy derivative</strong> → add a small <span class="math notranslate nohighlight">\(\tau_d\)</span>, consider pre-filtering measurement <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+<li><p><strong>Sluggish after saturation</strong> → lower <span class="math notranslate nohighlight">\(K_i\)</span>, reduce <span class="math notranslate nohighlight">\(T_{\text{aw}}\)</span>, or widen limits if physically valid.</p></li>
+<li><p><strong>Steady-state bias</strong> → increase <span class="math notranslate nohighlight">\(K_i\)</span> carefully or check for model/offsets; ensure sensor scale is correct.</p></li>
+<li><p><strong>Discrete time too slow</strong> → decrease <span class="math notranslate nohighlight">\(\Delta t\)</span> (sample faster), retune; derivative becomes unreliable at long sample periods.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "suann124/AIinTeaching",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="student-guide.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">🚀 Student Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="simulation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Interactive PID Simulation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-loop-and-the-error-signal">1. Feedback loop and the error signal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pid-law-time-and-laplace-domains">2. PID law (time and Laplace domains)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#closed-loop-transfer-functions">3. Closed-loop transfer functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-pid-derivative-filtering-and-anti-windup">4. Practical PID: derivative filtering and anti-windup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-time-implementation-ready-to-run">5. Discrete-time implementation (ready to run)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant-no-scipy-needed">6. Worked example: first-order plant (no SciPy needed)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">7. A simple manual tuning recipe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">8. Discrete PID you can paste into projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">9. Common pitfalls (and quick fixes)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Su Ann Low
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  <!-- Chat widget container (fill via extra_js if you add a widget later) -->
+<div id="chat-root"></div>
+
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

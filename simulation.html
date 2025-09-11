@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Interactive PID Simulation &#8212; Interactive Control Lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/chat.css?v=16a4e30f" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'simulation';</script>
+    <script src="_static/inverted-pendulum.js?v=e453125a"></script>
+    <script src="_static/chat.js?v=2af54417"></script>
+    <script src="_static/fixed-simulation.js?v=1c732286"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Exercises" href="exercises.html" />
+    <link rel="prev" title="Lecture 1: (PID) Control" href="pid.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Interactive Control Lab</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    🎯 Introduction
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="student-guide.html">🚀 Student Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pid.html">Lecture 1: (PID) Control</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Interactive PID Simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Further Reading</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/simulation.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Interactive PID Simulation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inverted-pendulum-control">Inverted Pendulum Control</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-the-simulation">How to Use the Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-simple">1. <strong>Start Simple</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-damping">2. <strong>Add Damping</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eliminate-steady-state-error">3. <strong>Eliminate Steady-State Error</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-robustness">4. <strong>Test Robustness</strong></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-physics">Understanding the Physics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-exercises">Experimental Exercises</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#teaching-notes">Teaching Notes</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="interactive-pid-simulation">
+<h1>Interactive PID Simulation<a class="headerlink" href="#interactive-pid-simulation" title="Link to this heading">#</a></h1>
+<div class="tip admonition">
+<p class="admonition-title">🎯 Learning Objectives</p>
+<p>After using this simulation, you should be able to:</p>
+<ul class="simple">
+<li><p><strong>Observe</strong> how P, I, D terms affect system response in real-time</p></li>
+<li><p><strong>Experiment</strong> with different parameter combinations and see immediate results</p></li>
+<li><p><strong>Understand</strong> the trade-offs between response speed, stability, and robustness</p></li>
+<li><p><strong>Apply</strong> PID tuning intuition to a realistic nonlinear system</p></li>
+</ul>
+</div>
+<section id="inverted-pendulum-control">
+<h2>Inverted Pendulum Control<a class="headerlink" href="#inverted-pendulum-control" title="Link to this heading">#</a></h2>
+<p>The simulation below lets you control a <strong>rotary inverted pendulum</strong> - a classic control challenge where you balance a pendulum in the upright position using torque at the base.</p>
+<p><strong>Key Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Real-time visualization</strong> of angle tracking and control signals</p></li>
+<li><p><strong>Interactive sliders</strong> for all PID parameters (Kp, Ki, Kd)</p></li>
+<li><p><strong>Multiple reference types</strong>: step changes and sine wave tracking</p></li>
+<li><p><strong>Disturbance testing</strong> to evaluate robustness</p></li>
+<li><p><strong>Physical parameter tuning</strong> (mass, length, damping, gravity)</p></li>
+</ul>
+<div class="pid-simulation-container" style="margin: 20px 0;">
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <p>🔄 Loading interactive PID simulation...</p>
+        <p style="font-size: 14px; margin-top: 10px;">
+            This may take a few seconds to initialize...
+        </p>
+    </div>
+</div>
+
+<style>
+.slider-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+}
+
+.slider-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+}
+
+.slider-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+}
+</style></section>
+<section id="how-to-use-the-simulation">
+<h2>How to Use the Simulation<a class="headerlink" href="#how-to-use-the-simulation" title="Link to this heading">#</a></h2>
+<section id="start-simple">
+<h3>1. <strong>Start Simple</strong><a class="headerlink" href="#start-simple" title="Link to this heading">#</a></h3>
+<p>Begin with Kp-only control:</p>
+<ul class="simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">Ki</span> <span class="pre">=</span> <span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">Kd</span> <span class="pre">=</span> <span class="pre">0</span></code></p></li>
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">Kp</span></code> from 0 until you get reasonable tracking</p></li>
+<li><p>Notice when oscillations start to appear</p></li>
+</ul>
+</section>
+<section id="add-damping">
+<h3>2. <strong>Add Damping</strong><a class="headerlink" href="#add-damping" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Gradually increase <code class="docutils literal notranslate"><span class="pre">Kd</span></code> to reduce overshoot</p></li>
+<li><p>Observe how derivative action smooths the response</p></li>
+</ul>
+</section>
+<section id="eliminate-steady-state-error">
+<h3>3. <strong>Eliminate Steady-State Error</strong><a class="headerlink" href="#eliminate-steady-state-error" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add small amounts of <code class="docutils literal notranslate"><span class="pre">Ki</span></code> to remove any remaining offset</p></li>
+<li><p>Watch for integral windup when saturation occurs</p></li>
+</ul>
+</section>
+<section id="test-robustness">
+<h3>4. <strong>Test Robustness</strong><a class="headerlink" href="#test-robustness" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Enable disturbance torque at t = 3 seconds</p></li>
+<li><p>Try different physical parameters (mass, length)</p></li>
+<li><p>Switch to sine wave tracking for dynamic performance</p></li>
+</ul>
+</section>
+</section>
+<section id="understanding-the-physics">
+<h2>Understanding the Physics<a class="headerlink" href="#understanding-the-physics" title="Link to this heading">#</a></h2>
+<p>The inverted pendulum follows the nonlinear dynamics:</p>
+<div class="math notranslate nohighlight">
+\[I\ddot{\theta} = u + d - c\dot{\theta} - mgl\sin(\theta)\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(I = ml^2\)</span> is the rotational inertia</p></li>
+<li><p><span class="math notranslate nohighlight">\(u\)</span> is the control torque (PID output)</p></li>
+<li><p><span class="math notranslate nohighlight">\(d\)</span> is the disturbance torque</p></li>
+<li><p><span class="math notranslate nohighlight">\(c\)</span> is viscous damping</p></li>
+<li><p><span class="math notranslate nohighlight">\(mgl\sin(\theta)\)</span> is the gravitational restoring torque</p></li>
+</ul>
+<p>The <strong>nonlinearity</strong> from <span class="math notranslate nohighlight">\(\sin(\theta)\)</span> makes this much more challenging than linear systems - small changes in parameters can have dramatic effects!</p>
+</section>
+<section id="experimental-exercises">
+<h2>Experimental Exercises<a class="headerlink" href="#experimental-exercises" title="Link to this heading">#</a></h2>
+<div class="note admonition">
+<p class="admonition-title">🧪 Try These Experiments</p>
+<p><strong>Experiment 1: PID Tuning</strong></p>
+<ol class="arabic simple">
+<li><p>Start with Kp=10, Ki=0, Kd=0</p></li>
+<li><p>Increase Kp until you see oscillations</p></li>
+<li><p>Add Kd=2 and see the improvement</p></li>
+<li><p>Add Ki=1 and observe steady-state performance</p></li>
+</ol>
+<p><strong>Experiment 2: Saturation Effects</strong></p>
+<ol class="arabic simple">
+<li><p>Set low torque limit (|u|max = 2 N·m)</p></li>
+<li><p>Try large step changes (θ_ref = 0.3 rad)</p></li>
+<li><p>Watch how integral windup affects recovery</p></li>
+</ol>
+<p><strong>Experiment 3: Nonlinear Behavior</strong></p>
+<ol class="arabic simple">
+<li><p>Try large angle disturbances near ±π</p></li>
+<li><p>Compare response to small vs large reference steps</p></li>
+<li><p>Change gravity to see how nonlinearity scales</p></li>
+</ol>
+</div>
+</section>
+<section id="teaching-notes">
+<h2>Teaching Notes<a class="headerlink" href="#teaching-notes" title="Link to this heading">#</a></h2>
+<p>This simulation demonstrates several key control concepts:</p>
+<ul class="simple">
+<li><p><strong>P-I-D Trade-offs</strong>: Speed vs stability vs steady-state accuracy</p></li>
+<li><p><strong>Saturation &amp; Anti-windup</strong>: How actuator limits affect performance</p></li>
+<li><p><strong>Nonlinear Effects</strong>: Why linear design techniques have limitations</p></li>
+<li><p><strong>Disturbance Rejection</strong>: The value of integral action</p></li>
+<li><p><strong>Physical Intuition</strong>: How plant parameters affect control difficulty</p></li>
+</ul>
+<p>The pendulum is an excellent teaching example because:</p>
+<ul class="simple">
+<li><p>Students can <strong>visualize</strong> the physics (balancing a stick)</p></li>
+<li><p><strong>Nonlinearity</strong> is obvious and dramatic</p></li>
+<li><p><strong>Parameter effects</strong> are immediately visible</p></li>
+<li><p>It bridges theory with <strong>real robotics applications</strong></p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>Next</strong>: Try implementing this PID controller in the <a class="reference internal" href="pid.html"><span class="std std-doc">Python exercises</span></a> and compare simulated vs theoretical performance!</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "suann124/AIinTeaching",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pid.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lecture 1: (PID) Control</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="exercises.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Exercises</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inverted-pendulum-control">Inverted Pendulum Control</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-the-simulation">How to Use the Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#start-simple">1. <strong>Start Simple</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-damping">2. <strong>Add Damping</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eliminate-steady-state-error">3. <strong>Eliminate Steady-State Error</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-robustness">4. <strong>Test Robustness</strong></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-physics">Understanding the Physics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-exercises">Experimental Exercises</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#teaching-notes">Teaching Notes</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Su Ann Low
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  <!-- Chat widget container (fill via extra_js if you add a widget later) -->
+<div id="chat-root"></div>
+
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
