@@ -399,15 +399,24 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-loop-and-the-error-signal">1. Feedback loop and the error signal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pid-law-time-and-laplace-domains">2. PID law (time and Laplace domains)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#closed-loop-transfer-functions">3. Closed-loop transfer functions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-pid-derivative-filtering-and-anti-windup">4. Practical PID: derivative filtering and anti-windup</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-time-implementation-ready-to-run">5. Discrete-time implementation (ready to run)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant-no-scipy-needed">6. Worked example: first-order plant (no SciPy needed)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">7. A simple manual tuning recipe</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">8. Discrete PID you can paste into projects</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">9. Common pitfalls (and quick fixes)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proportional-integral-derivative-pid-control-structure">1. Proportional-Integral-Derivative (PID) Control Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfer-function-representation">2. Transfer Function Representation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-of-proportional-only-control">3. Analysis of Proportional-Only Control</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#effect-of-integral-action">4. Effect of Integral Action</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#effect-of-derivative-action">5. Effect of Derivative Action</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implementation-considerations">6. Practical Implementation Considerations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant">7. Worked Example: First-Order Plant</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interactive-simulation-example">8. Interactive Simulation Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment-understanding-p-i-d-effects-on-a-second-order-plant">9. Experiment: Understanding P, I, D effects on a second-order plant</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-proportional-only-control">Step 1: Proportional-only control</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-adding-integral-action-pi-control">Step 2: Adding integral action (PI control)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-adding-derivative-action-full-pid">Step 3: Adding derivative action (full PID)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-frequency-domain-analysis">Step 4: Frequency domain analysis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">10. A simple manual tuning recipe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">11. Discrete PID you can paste into projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">12. Common pitfalls (and quick fixes)</a></li>
 </ul>
             </nav>
         </div>
@@ -424,12 +433,12 @@ document.write(`
 <div class="tip admonition">
 <p class="admonition-title">What you will learn</p>
 <ul class="simple">
-<li><p>The standard feedback loop and what <strong>P</strong>, <strong>I</strong>, <strong>D</strong> terms do</p></li>
-<li><p>Time- and Laplace-domain forms of PID</p></li>
-<li><p>Closed-loop transfer functions and basic performance intuition</p></li>
-<li><p>Practical <strong>derivative filtering</strong> and <strong>anti-windup</strong></p></li>
-<li><p>Discrete-time implementation you can run in Python</p></li>
-<li><p>A sane, step-by-step <strong>manual tuning</strong> recipe (+ Ziegler–Nichols option)</p></li>
+<li><p><strong>PID controller structure</strong> and transfer function representation</p></li>
+<li><p><strong>Closed-loop analysis</strong> using transfer functions <span class="math notranslate nohighlight">\(G_{ry}(s)\)</span></p></li>
+<li><p>Effects of <strong>P</strong>, <strong>I</strong>, <strong>D</strong> terms on steady-state error and transient response</p></li>
+<li><p><strong>Disturbance rejection</strong> properties of integral action</p></li>
+<li><p><strong>Practical implementation</strong> considerations and discrete-time forms</p></li>
+<li><p><strong>Manual tuning</strong> strategies based on closed-loop characteristics</p></li>
 </ul>
 </div>
 <aside class="margin sidebar">
@@ -440,85 +449,118 @@ The PDF is embedded below for quick reference.</p>
 <object data="_static/pid.pdf" type="application/pdf" width="100%" height="520px">
   <p>PDF preview unavailable. <a href="_static/pid.pdf">Open the PDF.</a></p>
 </object><hr class="docutils" />
-<section id="feedback-loop-and-the-error-signal">
-<h2>1. Feedback loop and the error signal<a class="headerlink" href="#feedback-loop-and-the-error-signal" title="Link to this heading">#</a></h2>
-<p>We regulate plant output <span class="math notranslate nohighlight">\(y(t)\)</span> to follow a reference <span class="math notranslate nohighlight">\(r(t)\)</span>.
-The <strong>error</strong> is</p>
+<section id="proportional-integral-derivative-pid-control-structure">
+<h2>1. Proportional-Integral-Derivative (PID) Control Structure<a class="headerlink" href="#proportional-integral-derivative-pid-control-structure" title="Link to this heading">#</a></h2>
+<p>Consider the standard unity feedback control system where we want the plant output <span class="math notranslate nohighlight">\(y(t)\)</span> to track a reference signal <span class="math notranslate nohighlight">\(r(t)\)</span>. The <strong>error signal</strong> is defined as:</p>
 <div class="math notranslate nohighlight">
-\[e(t) = r(t) - y(t).\]</div>
-<p>A controller computes the control input <span class="math notranslate nohighlight">\(u(t)\)</span> from <span class="math notranslate nohighlight">\(e(t)\)</span>. With unity
-feedback the closed-loop block diagram is:</p>
-<figure class="align-center" id="fig-pid-block">
-<img alt="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=Reference+--&gt;(+)+--+--&gt;+Controller+--&gt;+Plant+--&gt;+y(t);+(-)+feedback" src="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=Reference+--&gt;(+)+--+--&gt;+Controller+--&gt;+Plant+--&gt;+y(t);+(-)+feedback" />
+\[e(t) = r(t) - y(t)\]</div>
+<p>The PID controller computes the control input as:</p>
+<div class="math notranslate nohighlight">
+\[u(t) = k_p e(t) + k_i \int_0^t e(\tau)d\tau + k_d \frac{de(t)}{dt}\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><strong>Proportional term</strong>: <span class="math notranslate nohighlight">\(k_p e(t)\)</span> depends on the instantaneous error value</p></li>
+<li><p><strong>Integral term</strong>: <span class="math notranslate nohighlight">\(k_i \int_0^t e(\tau)d\tau\)</span> is based on the integral of error up to time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+<li><p><strong>Derivative term</strong>: <span class="math notranslate nohighlight">\(k_d \frac{de(t)}{dt}\)</span> provides an estimate of the future error</p></li>
+</ul>
+<figure class="align-center" id="fig-pid-structure">
+<img alt="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=r+--&gt;(+)+--+--&gt;+PID+Controller+--&gt;+Plant+P(s)+--&gt;+y(t);+(-)+feedback" src="https://dummyimage.com/880x150/ffffff/000000.png&amp;text=r+--&gt;(+)+--+--&gt;+PID+Controller+--&gt;+Plant+P(s)+--&gt;+y(t);+(-)+feedback" />
 <figcaption>
-<p><span class="caption-number">Fig. 1 </span><span class="caption-text">A standard unity-feedback loop: the controller acts on the error <span class="math notranslate nohighlight">\(e=r-y\)</span>.</span><a class="headerlink" href="#fig-pid-block" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Unity feedback system with PID controller</span><a class="headerlink" href="#fig-pid-structure" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
 <hr class="docutils" />
-<section id="pid-law-time-and-laplace-domains">
-<h2>2. PID law (time and Laplace domains)<a class="headerlink" href="#pid-law-time-and-laplace-domains" title="Link to this heading">#</a></h2>
-<p>The continuous-time PID law is</p>
+<section id="transfer-function-representation">
+<h2>2. Transfer Function Representation<a class="headerlink" href="#transfer-function-representation" title="Link to this heading">#</a></h2>
+<p>Taking the Laplace transform (assuming zero initial conditions), the <strong>controller transfer function</strong> from error <span class="math notranslate nohighlight">\(e\)</span> to control input <span class="math notranslate nohighlight">\(u\)</span> is:</p>
 <div class="math notranslate nohighlight">
-\[u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d\frac{de}{dt}(t).\]</div>
-<p>In Laplace domain (assuming zero initial conditions):</p>
+\[C(s) = k_p + \frac{k_i}{s} + k_d s\]</div>
+<p>For a plant with transfer function <span class="math notranslate nohighlight">\(P(s)\)</span>, the <strong>closed-loop transfer function</strong> from reference <span class="math notranslate nohighlight">\(r\)</span> to output <span class="math notranslate nohighlight">\(y\)</span> is:</p>
 <div class="math notranslate nohighlight">
-\[U(s) = \left(K_p + \frac{K_i}{s} + K_d s\right) E(s) = G_c(s)E(s),\]</div>
-<p>with controller transfer function</p>
+\[G_{ry}(s) = \frac{P(s)C(s)}{1 + P(s)C(s)}\]</div>
+<p><strong>Key insight</strong>: The steady-state gain of a stable transfer function <span class="math notranslate nohighlight">\(H(s)\)</span> under unit step input is <span class="math notranslate nohighlight">\(H(0)\)</span>.</p>
+</section>
+<hr class="docutils" />
+<section id="analysis-of-proportional-only-control">
+<h2>3. Analysis of Proportional-Only Control<a class="headerlink" href="#analysis-of-proportional-only-control" title="Link to this heading">#</a></h2>
+<p>Consider <strong>pure proportional feedback</strong> with <span class="math notranslate nohighlight">\(k_i = 0\)</span> and <span class="math notranslate nohighlight">\(k_d = 0\)</span>, so <span class="math notranslate nohighlight">\(C(s) = k_p\)</span>.</p>
+<p>The steady-state output due to a unit step reference input is:</p>
 <div class="math notranslate nohighlight">
-\[G_c(s) = K_p + \frac{K_i}{s} + K_d s.\]</div>
-<p><strong>Intuition</strong></p>
+\[y_{ss} = G_{ry}(0) \cdot 1 = \frac{C(0)P(0)}{1 + C(0)P(0)} = \frac{k_p P(0)}{1 + k_p P(0)}\]</div>
+<p><strong>Key observations:</strong></p>
 <ul class="simple">
-<li><p><strong>P</strong> reacts to present error → faster response, but too large <span class="math notranslate nohighlight">\(K_p\)</span> can cause overshoot/instability.</p></li>
-<li><p><strong>I</strong> removes steady-state error (adds a pole at 0) → improves tracking of steps/ramps, but can slow response and cause windup.</p></li>
-<li><p><strong>D</strong> predicts/”brakes” fast changes → reduces overshoot and improves damping, but is noise-sensitive.</p></li>
+<li><p><strong>Steady-state error exists</strong>: <span class="math notranslate nohighlight">\(e_{ss} = 1 - y_{ss} = \frac{1}{1 + k_p P(0)}\)</span></p></li>
+<li><p><strong>Error decreases</strong> as <span class="math notranslate nohighlight">\(k_p\)</span> increases, but <strong>never reaches zero</strong></p></li>
+<li><p><strong>Trade-off</strong>: Larger <span class="math notranslate nohighlight">\(k_p\)</span> reduces steady-state error but can cause overshoot and oscillations</p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="closed-loop-transfer-functions">
-<h2>3. Closed-loop transfer functions<a class="headerlink" href="#closed-loop-transfer-functions" title="Link to this heading">#</a></h2>
-<p>For plant <span class="math notranslate nohighlight">\(G_p(s)\)</span> and controller <span class="math notranslate nohighlight">\(G_c(s)\)</span> with unity feedback,</p>
+<section id="effect-of-integral-action">
+<h2>4. Effect of Integral Action<a class="headerlink" href="#effect-of-integral-action" title="Link to this heading">#</a></h2>
+<p>Now consider <strong>PI control</strong> with <span class="math notranslate nohighlight">\(C(s) = k_p + \frac{k_i}{s}\)</span>.</p>
+<p>The closed-loop transfer function becomes:</p>
 <div class="math notranslate nohighlight">
-\[T(s) \equiv \frac{Y(s)}{R(s)} = \frac{G_c(s)G_p(s)}{1 + G_c(s)G_p(s)}, \quad
-S(s) \equiv \frac{E(s)}{R(s)} = \frac{1}{1+G_c(s)G_p(s)}.\]</div>
+\[G_{ry}(s) = \frac{\left(k_p + \frac{k_i}{s}\right) P(s)}{1 + \left(k_p + \frac{k_i}{s}\right) P(s)} = \frac{(k_p s + k_i) P(s)}{s + P(s)(k_p s + k_i)}\]</div>
+<p>For steady-state analysis with unit step reference:</p>
+<div class="math notranslate nohighlight">
+\[G_{ry}(0) = \frac{k_i P(0)}{k_i P(0)} = 1\]</div>
+<p><strong>Key results:</strong></p>
 <ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(T(s)\)</span> is the <strong>complementary sensitivity</strong> (reference→output).</p></li>
-<li><p><span class="math notranslate nohighlight">\(S(s)\)</span> is the <strong>sensitivity</strong> (reference→error, and also output’s sensitivity to plant/model errors).</p></li>
+<li><p><strong>Perfect reference tracking</strong>: <span class="math notranslate nohighlight">\(y_{ss} = 1\)</span> regardless of plant parameters</p></li>
+<li><p><strong>Zero steady-state error</strong>: Independent of plant gain <span class="math notranslate nohighlight">\(P(0)\)</span></p></li>
+<li><p><strong>Trade-off</strong>: Higher <span class="math notranslate nohighlight">\(k_i\)</span> speeds convergence but increases oscillations</p></li>
+</ul>
+<p><strong>Disturbance rejection</strong>: With only integral action <span class="math notranslate nohighlight">\(C(s) = k_i/s\)</span>, the transfer function from step disturbance <span class="math notranslate nohighlight">\(d\)</span> to output is:</p>
+<div class="math notranslate nohighlight">
+\[G_{dy}(s) = \frac{P(s)}{1 + P(s)C(s)} \Rightarrow G_{dy}(0) = 0\]</div>
+<p>This gives <strong>perfect disturbance rejection</strong> at steady-state.</p>
+</section>
+<hr class="docutils" />
+<section id="effect-of-derivative-action">
+<h2>5. Effect of Derivative Action<a class="headerlink" href="#effect-of-derivative-action" title="Link to this heading">#</a></h2>
+<p>Adding the derivative term gives full <strong>PID control</strong>: <span class="math notranslate nohighlight">\(C(s) = k_p + \frac{k_i}{s} + k_d s\)</span>.</p>
+<p><strong>Key insight</strong>: The derivative term acts on the rate of change of error, effectively providing a “prediction” of future error and helping to “brake” the system response.</p>
+<p><strong>Damping effect</strong>: Consider a second-order plant with natural frequency <span class="math notranslate nohighlight">\(\omega_n\)</span> and damping ratio <span class="math notranslate nohighlight">\(\zeta\)</span>. Adding derivative control with gain <span class="math notranslate nohighlight">\(k_d\)</span> modifies the closed-loop damping:</p>
+<div class="math notranslate nohighlight">
+\[\zeta_{new} = \zeta + \frac{k_d \omega_n}{2}\]</div>
+<p><strong>Benefits of derivative action:</strong></p>
+<ul class="simple">
+<li><p><strong>Reduces overshoot</strong> and oscillations in step response</p></li>
+<li><p><strong>Improves stability margins</strong> and transient performance</p></li>
+<li><p><strong>Provides faster settling</strong> without increasing steady-state error</p></li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul class="simple">
+<li><p><strong>Amplifies high-frequency noise</strong> due to differentiation</p></li>
+<li><p><strong>No effect on steady-state</strong> behavior (since <span class="math notranslate nohighlight">\(\lim_{s \to 0} k_d s = 0\)</span>)</p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="practical-pid-derivative-filtering-and-anti-windup">
-<h2>4. Practical PID: derivative filtering and anti-windup<a class="headerlink" href="#practical-pid-derivative-filtering-and-anti-windup" title="Link to this heading">#</a></h2>
-<p><strong>Derivative filtering.</strong> Use a first-order filter to avoid amplifying sensor noise:</p>
+<section id="practical-implementation-considerations">
+<h2>6. Practical Implementation Considerations<a class="headerlink" href="#practical-implementation-considerations" title="Link to this heading">#</a></h2>
+<p><strong>Derivative filtering</strong>: In practice, pure differentiation amplifies noise. Use a filtered derivative:</p>
 <div class="math notranslate nohighlight">
-\[G_d(s) = \frac{K_d s}{1 + \tau_d s}, \quad \text{so } G_c(s) = K_p + \frac{K_i}{s} + \frac{K_d s}{1 + \tau_d s}.\]</div>
-<p>Typical <span class="math notranslate nohighlight">\(\tau_d\)</span> is small (e.g., <span class="math notranslate nohighlight">\(\tau_d = K_d / N\)</span> with <span class="math notranslate nohighlight">\(N \in [5,20]\)</span>).</p>
-<p><strong>Actuator saturation &amp; integral windup.</strong> If <span class="math notranslate nohighlight">\(u\)</span> saturates (e.g., <span class="math notranslate nohighlight">\(|u| \le u_{\max}\)</span>), the integrator can accumulate error and cause slow recovery.
-A common <strong>back-calculation</strong> anti-windup is</p>
-<div class="math notranslate nohighlight">
-\[\dot{x}_I = e + \frac{u_\text{sat}-u_\text{raw}}{T_\text{aw}},\]</div>
-<p>where <span class="math notranslate nohighlight">\(x_I\)</span> is the integrator state, <span class="math notranslate nohighlight">\(u_{\text{raw}}\)</span> the unclipped control, and <span class="math notranslate nohighlight">\(u_{\text{sat}}\)</span> the saturated control.
-<span class="math notranslate nohighlight">\(T_\text{aw}\)</span> tunes how aggressively the integrator is “unwound”.</p>
+\[C(s) = k_p + \frac{k_i}{s} + \frac{k_d s}{1 + \tau_d s}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tau_d\)</span> is a small time constant (typically <span class="math notranslate nohighlight">\(\tau_d = k_d/N\)</span> with <span class="math notranslate nohighlight">\(N \in [5,20]\)</span>).</p>
+<p><strong>Integral windup</strong>: When actuators saturate, the integrator can accumulate large values leading to poor transient response. <strong>Anti-windup schemes</strong> prevent this by stopping integration when saturation occurs.</p>
+<p><strong>Digital implementation</strong>: For sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span>, use approximations:</p>
+<ul class="simple">
+<li><p><strong>Integral</strong>: Trapezoidal rule for better accuracy</p></li>
+<li><p><strong>Derivative</strong>: Backward difference with filtering for noise rejection</p></li>
+</ul>
 </section>
 <hr class="docutils" />
-<section id="discrete-time-implementation-ready-to-run">
-<h2>5. Discrete-time implementation (ready to run)<a class="headerlink" href="#discrete-time-implementation-ready-to-run" title="Link to this heading">#</a></h2>
-<p>Let sampling time be <span class="math notranslate nohighlight">\(\Delta t\)</span>. A robust direct form uses the <strong>trapezoidal (Tustin)</strong> integral and a filtered derivative:</p>
-<p><strong>Integral update (trapezoidal):</strong></p>
-<div class="math notranslate nohighlight">
-\[x_I[k] = x_I[k-1] + \frac{\Delta t}{2}(e[k] + e[k-1])\]</div>
-<p><strong>Filtered derivative:</strong></p>
-<div class="math notranslate nohighlight">
-\[d[k] = \alpha d[k-1] + (1-\alpha)\frac{e[k]-e[k-1]}{\Delta t}, \quad \alpha=\frac{\tau_d}{\tau_d+\Delta t}\]</div>
-<p><strong>PID output:</strong></p>
-<div class="math notranslate nohighlight">
-\[u_\text{raw}[k] = K_p e[k] + K_i x_I[k] + K_d d[k]\]</div>
-<p><strong>Saturation:</strong></p>
-<div class="math notranslate nohighlight">
-\[u[k] = \text{clip}(u_\text{raw}[k], u_{\min}, u_{\max})\]</div>
-<p><strong>Anti-windup back-calculation:</strong></p>
-<div class="math notranslate nohighlight">
-\[x_I[k] \mathrel{+}= \frac{u[k]-u_\text{raw}[k]}{T_\text{aw}}\]</div>
+<section id="worked-example-first-order-plant">
+<h2>7. Worked Example: First-Order Plant<a class="headerlink" href="#worked-example-first-order-plant" title="Link to this heading">#</a></h2>
+<p>Consider a simple first-order plant: <span class="math notranslate nohighlight">\(P(s) = \frac{1}{s+1}\)</span> and analyze the effect of different controller structures.</p>
+<p><strong>P-only control</strong>: <span class="math notranslate nohighlight">\(C(s) = k_p\)</span></p>
+<p>Closed-loop transfer function: <span class="math notranslate nohighlight">\(G_{ry}(s) = \frac{k_p}{s + 1 + k_p}\)</span></p>
+<p>Steady-state value for unit step: <span class="math notranslate nohighlight">\(y_{ss} = \frac{k_p}{1 + k_p}\)</span></p>
+<p><strong>PI control</strong>: <span class="math notranslate nohighlight">\(C(s) = k_p + \frac{k_i}{s}\)</span></p>
+<p>Closed-loop transfer function: <span class="math notranslate nohighlight">\(G_{ry}(s) = \frac{k_p s + k_i}{s^2 + (1+k_p)s + k_i}\)</span></p>
+<p>Steady-state value for unit step: <span class="math notranslate nohighlight">\(y_{ss} = 1\)</span> (perfect tracking)</p>
+<p>The poles are at <span class="math notranslate nohighlight">\(s = \frac{-(1+k_p) \pm \sqrt{(1+k_p)^2 - 4k_i}}{2}\)</span></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -555,8 +597,8 @@ A common <strong>back-calculation</strong> anti-windup is</p>
 </div>
 </section>
 <hr class="docutils" />
-<section id="worked-example-first-order-plant-no-scipy-needed">
-<h2>6. Worked example: first-order plant (no SciPy needed)<a class="headerlink" href="#worked-example-first-order-plant-no-scipy-needed" title="Link to this heading">#</a></h2>
+<section id="interactive-simulation-example">
+<h2>8. Interactive Simulation Example<a class="headerlink" href="#interactive-simulation-example" title="Link to this heading">#</a></h2>
 <p>Consider <span class="math notranslate nohighlight">\(x_{k+1} = x_k + \Delta t [a (u_k - x_k)]\)</span><br />
 (a leaky bucket / first-order lag with rate <span class="math notranslate nohighlight">\(a\)</span>).</p>
 <div class="cell docutils container">
@@ -618,8 +660,338 @@ A common <strong>back-calculation</strong> anti-windup is</p>
 <p><strong>Try this:</strong> increase <span class="math notranslate nohighlight">\(K_p\)</span> (faster but overshoot), add <span class="math notranslate nohighlight">\(K_d\)</span> (damps overshoot), then raise <span class="math notranslate nohighlight">\(K_i\)</span> (remove any residual bias, watch for windup).</p>
 </section>
 <hr class="docutils" />
+<section id="experiment-understanding-p-i-d-effects-on-a-second-order-plant">
+<h2>9. Experiment: Understanding P, I, D effects on a second-order plant<a class="headerlink" href="#experiment-understanding-p-i-d-effects-on-a-second-order-plant" title="Link to this heading">#</a></h2>
+<p>Let’s explore how each PID term affects system behavior using a <strong>mass-spring-damper</strong> system (common in mechanical control). The plant transfer function is:</p>
+<div class="math notranslate nohighlight">
+\[G_p(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\omega_n = 2\)</span> rad/s is the natural frequency and <span class="math notranslate nohighlight">\(\zeta = 0.1\)</span> is the damping ratio (lightly damped).</p>
+<section id="step-1-proportional-only-control">
+<h3>Step 1: Proportional-only control<a class="headerlink" href="#step-1-proportional-only-control" title="Link to this heading">#</a></h3>
+<p>First, let’s see what happens with <strong>P-only</strong> control (<span class="math notranslate nohighlight">\(K_i = 0\)</span>, <span class="math notranslate nohighlight">\(K_d = 0\)</span>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>
+
+<span class="c1"># Plant: underdamped second-order system</span>
+<span class="n">wn</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># natural frequency</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># damping ratio</span>
+<span class="n">num_p</span> <span class="o">=</span> <span class="p">[</span><span class="n">wn</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">den_p</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">zeta</span><span class="o">*</span><span class="n">wn</span><span class="p">,</span> <span class="n">wn</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">Gp</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">(</span><span class="n">num_p</span><span class="p">,</span> <span class="n">den_p</span><span class="p">)</span>
+
+<span class="c1"># Time vector</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">multiply_tf</span><span class="p">(</span><span class="n">tf1</span><span class="p">,</span> <span class="n">tf2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiply two transfer functions manually&quot;&quot;&quot;</span>
+    <span class="c1"># (n1/d1) * (n2/d2) = (n1*n2)/(d1*d2)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polymul</span><span class="p">(</span><span class="n">tf1</span><span class="o">.</span><span class="n">num</span><span class="p">,</span> <span class="n">tf2</span><span class="o">.</span><span class="n">num</span><span class="p">)</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polymul</span><span class="p">(</span><span class="n">tf1</span><span class="o">.</span><span class="n">den</span><span class="p">,</span> <span class="n">tf2</span><span class="o">.</span><span class="n">den</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">den</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate closed-loop transfer function T = GcGp/(1+GcGp)&quot;&quot;&quot;</span>
+    <span class="c1"># First multiply Gc * Gp</span>
+    <span class="n">GcGp</span> <span class="o">=</span> <span class="n">multiply_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    
+    <span class="c1"># T = GcGp / (1 + GcGp)</span>
+    <span class="c1"># This means T = GcGp.num / (GcGp.den + GcGp.num)</span>
+    <span class="n">num_cl</span> <span class="o">=</span> <span class="n">GcGp</span><span class="o">.</span><span class="n">num</span>
+    <span class="n">den_cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyadd</span><span class="p">(</span><span class="n">GcGp</span><span class="o">.</span><span class="n">den</span><span class="p">,</span> <span class="n">GcGp</span><span class="o">.</span><span class="n">num</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">(</span><span class="n">num_cl</span><span class="p">,</span> <span class="n">den_cl</span><span class="p">)</span>
+
+<span class="c1"># Test different Kp values</span>
+<span class="n">Kp_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">Kp</span> <span class="ow">in</span> <span class="n">Kp_values</span><span class="p">:</span>
+    <span class="c1"># P-only controller</span>
+    <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Closed-loop transfer function T(s) = GcGp/(1+GcGp)</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    
+    <span class="c1"># Step response</span>
+    <span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Kp = </span><span class="si">{</span><span class="n">Kp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;P-only Control: Effect of Increasing Kp&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Show steady-state error for each case</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Steady-state values (should be 1.0 for perfect tracking):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Kp</span> <span class="ow">in</span> <span class="n">Kp_values</span><span class="p">:</span>
+    <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">ss_value</span> <span class="o">=</span> <span class="n">y_step</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ss_error</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">ss_value</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Kp = </span><span class="si">{</span><span class="n">Kp</span><span class="si">}</span><span class="s2">: SS value = </span><span class="si">{</span><span class="n">ss_value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, SS error = </span><span class="si">{</span><span class="n">ss_error</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/f3ecdd45900e1cdd2e63a4944e61229bd0fd23eed7177a3a269dcc52a57071ab.png" src="_images/f3ecdd45900e1cdd2e63a4944e61229bd0fd23eed7177a3a269dcc52a57071ab.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Steady-state values (should be 1.0 for perfect tracking):
+Kp = 0.5: SS value = 0.278, SS error = 0.722
+Kp = 1.0: SS value = 0.588, SS error = 0.412
+Kp = 2.0: SS value = 0.773, SS error = 0.227
+Kp = 4.0: SS value = 0.868, SS error = 0.132
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Observations:</strong></p>
+<ul class="simple">
+<li><p>Higher <span class="math notranslate nohighlight">\(K_p\)</span> → faster response but more overshoot</p></li>
+<li><p><strong>Steady-state error remains</strong> (P-only cannot eliminate it for step inputs)</p></li>
+<li><p>Too high <span class="math notranslate nohighlight">\(K_p\)</span> → system becomes oscillatory/unstable</p></li>
+</ul>
+</section>
+<section id="step-2-adding-integral-action-pi-control">
+<h3>Step 2: Adding integral action (PI control)<a class="headerlink" href="#step-2-adding-integral-action-pi-control" title="Link to this heading">#</a></h3>
+<p>Now add integral action to eliminate steady-state error:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PI Controller: Gc(s) = Kp + Ki/s</span>
+<span class="n">Kp</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Fixed proportional gain</span>
+<span class="n">Ki_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">Ki</span> <span class="ow">in</span> <span class="n">Ki_values</span><span class="p">:</span>
+    <span class="c1"># PI controller</span>
+    <span class="k">if</span> <span class="n">Ki</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;P-only (Ki = 0)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Kp + Ki/s = (Kp*s + Ki)/s</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;PI (Ki = </span><span class="si">{</span><span class="n">Ki</span><span class="si">}</span><span class="s1">)&#39;</span>
+    
+    <span class="c1"># Closed-loop</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PI Control: Effect of Adding Integral Action&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Check final values</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Final values with PI control:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Ki</span> <span class="ow">in</span> <span class="n">Ki_values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>  <span class="c1"># Skip Ki=0 case</span>
+    <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ki = </span><span class="si">{</span><span class="n">Ki</span><span class="si">}</span><span class="s2">: Final value = </span><span class="si">{</span><span class="n">y_step</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/1daf0fb43c7575ec9fb15b0fe4959b2d563ea754cb92108d57916f1c04362200.png" src="_images/1daf0fb43c7575ec9fb15b0fe4959b2d563ea754cb92108d57916f1c04362200.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Final values with PI control:
+Ki = 0.5: Final value = 1.183855
+Ki = 1.0: Final value = 1.643254
+Ki = 2.0: Final value = 3.315720
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Key insight:</strong> Integral action eliminates steady-state error but can make the response slower and more oscillatory.</p>
+</section>
+<section id="step-3-adding-derivative-action-full-pid">
+<h3>Step 3: Adding derivative action (full PID)<a class="headerlink" href="#step-3-adding-derivative-action-full-pid" title="Link to this heading">#</a></h3>
+<p>Finally, add derivative action to improve transient response:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PID Controller: Gc(s) = Kp + Ki/s + Kd*s</span>
+<span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span>  <span class="c1"># Fixed P and I gains</span>
+<span class="n">Kd_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">Kd</span> <span class="ow">in</span> <span class="n">Kd_values</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">Kd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># PI only</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;PI (Kd = 0)&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Kp + Ki/s + Kd*s = (Kd*s^2 + Kp*s + Ki)/s</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kd</span><span class="p">,</span> <span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;PID (Kd = </span><span class="si">{</span><span class="n">Kd</span><span class="si">}</span><span class="s1">)&#39;</span>
+    
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">y_step</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PID Control: Effect of Adding Derivative Action&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Performance metrics</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performance comparison (overshoot, settling time):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Kd</span> <span class="ow">in</span> <span class="n">Kd_values</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">Kd</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">controller_type</span> <span class="o">=</span> <span class="s2">&quot;PI&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Gc</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kd</span><span class="p">,</span> <span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">controller_type</span> <span class="o">=</span> <span class="s2">&quot;PID&quot;</span>
+    
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_step</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="c1"># Find overshoot</span>
+    <span class="n">peak_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_step</span><span class="p">)</span>
+    <span class="n">overshoot</span> <span class="o">=</span> <span class="p">(</span><span class="n">peak_value</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>  <span class="c1"># percentage</span>
+    
+    <span class="c1"># Find settling time (within 2% of final value)</span>
+    <span class="n">final_val</span> <span class="o">=</span> <span class="n">y_step</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">settle_band</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="n">final_val</span>
+    <span class="n">settled_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_step</span> <span class="o">-</span> <span class="n">final_val</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">settle_band</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">settled_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">settle_time</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">settled_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">settle_time</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">controller_type</span><span class="si">}</span><span class="s2"> (Kd=</span><span class="si">{</span><span class="n">Kd</span><span class="si">}</span><span class="s2">): Overshoot = </span><span class="si">{</span><span class="n">overshoot</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, Settling time = </span><span class="si">{</span><span class="n">settle_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/fe9610dfa9f4526c8be7c67ad9f84e979047674b91b5a668b3a4127cbadbb094.png" src="_images/fe9610dfa9f4526c8be7c67ad9f84e979047674b91b5a668b3a4127cbadbb094.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Performance comparison (overshoot, settling time):
+PI (Kd=0.0): Overshoot = 75.0%, Settling time = 5.48s
+PID (Kd=0.1): Overshoot = 21.0%, Settling time = 1.02s
+PID (Kd=0.2): Overshoot = 6.2%, Settling time = 0.93s
+PID (Kd=0.5): Overshoot = -0.6%, Settling time = 5.49s
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Derivative benefits:</strong></p>
+<ul class="simple">
+<li><p>Reduces overshoot and oscillation</p></li>
+<li><p>Improves damping and settling time</p></li>
+<li><p>Acts like a “brake” on fast changes</p></li>
+</ul>
+</section>
+<section id="step-4-frequency-domain-analysis">
+<h3>Step 4: Frequency domain analysis<a class="headerlink" href="#step-4-frequency-domain-analysis" title="Link to this heading">#</a></h3>
+<p>Let’s examine the <strong>closed-loop frequency response</strong> to understand stability margins:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare frequency responses</span>
+<span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.2</span>  <span class="c1"># Well-tuned PID</span>
+
+<span class="c1"># Controllers</span>
+<span class="n">Gc_P</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">Gc_PI</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">Gc_PID</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">Kd</span><span class="p">,</span> <span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">controllers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">Gc_P</span><span class="p">,</span> <span class="s2">&quot;P-only&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">Gc_PI</span><span class="p">,</span> <span class="s2">&quot;PI&quot;</span><span class="p">,</span> <span class="s2">&quot;orange&quot;</span><span class="p">),</span> 
+    <span class="p">(</span><span class="n">Gc_PID</span><span class="p">,</span> <span class="s2">&quot;PID&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># Frequency range</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Magnitude plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">controllers</span><span class="p">:</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">freqresp</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">H</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;-3 dB&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency [rad/s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Magnitude [dB]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Closed-Loop Frequency Response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Phase plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">controllers</span><span class="p">:</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">freqresp</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency [rad/s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Phase [degrees]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Closed-Loop Phase Response&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Bandwidth comparison</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Closed-loop bandwidth (-3 dB frequency):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">controllers</span><span class="p">:</span>
+    <span class="n">T_cl</span> <span class="o">=</span> <span class="n">closed_loop_tf</span><span class="p">(</span><span class="n">Gc</span><span class="p">,</span> <span class="n">Gp</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">freqresp</span><span class="p">(</span><span class="n">T_cl</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">mag_db</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    
+    <span class="c1"># Find -3 dB point</span>
+    <span class="n">idx_3db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mag_db</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">3</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_3db</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">idx_3db</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">bw</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> rad/s&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: &gt; </span><span class="si">{</span><span class="n">w</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> rad/s (no -3 dB point found)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/88a654b1177e8ff5c7a74f424cf4640f016788be0d5a1ed2efbf3ac67e25bac4.png" src="_images/88a654b1177e8ff5c7a74f424cf4640f016788be0d5a1ed2efbf3ac67e25bac4.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Closed-loop bandwidth (-3 dB frequency):
+P-only: 0.10 rad/s
+PI: 3.72 rad/s
+PID: 0.79 rad/s
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Summary of PID effects:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>P</strong>: Fast response, steady-state error, potential instability</p></li>
+<li><p><strong>I</strong>: Eliminates steady-state error, slower response, can cause oscillation</p></li>
+<li><p><strong>D</strong>: Improves damping, reduces overshoot, increases bandwidth</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
 <section id="a-simple-manual-tuning-recipe">
-<h2>7. A simple manual tuning recipe<a class="headerlink" href="#a-simple-manual-tuning-recipe" title="Link to this heading">#</a></h2>
+<h2>10. A simple manual tuning recipe<a class="headerlink" href="#a-simple-manual-tuning-recipe" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p><strong>Start conservative.</strong> Set <span class="math notranslate nohighlight">\(K_i = 0\)</span>, <span class="math notranslate nohighlight">\(K_d = 0\)</span>. Increase <span class="math notranslate nohighlight">\(K_p\)</span> until the output responds quickly but without sustained oscillation.</p></li>
 <li><p><strong>Add derivative.</strong> Increase <span class="math notranslate nohighlight">\(K_d\)</span> to reduce overshoot/oscillation; tune <span class="math notranslate nohighlight">\(\tau_d\)</span> so derivative is smooth (e.g., <span class="math notranslate nohighlight">\(\tau_d \approx 5\Delta t\)</span>).</p></li>
@@ -636,7 +1008,7 @@ These are aggressive; back off for robustness.</p></li>
 </section>
 <hr class="docutils" />
 <section id="discrete-pid-you-can-paste-into-projects">
-<h2>8. Discrete PID you can paste into projects<a class="headerlink" href="#discrete-pid-you-can-paste-into-projects" title="Link to this heading">#</a></h2>
+<h2>11. Discrete PID you can paste into projects<a class="headerlink" href="#discrete-pid-you-can-paste-into-projects" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PID</span><span class="p">:</span>
@@ -674,7 +1046,7 @@ These are aggressive; back off for robustness.</p></li>
 </section>
 <hr class="docutils" />
 <section id="common-pitfalls-and-quick-fixes">
-<h2>9. Common pitfalls (and quick fixes)<a class="headerlink" href="#common-pitfalls-and-quick-fixes" title="Link to this heading">#</a></h2>
+<h2>12. Common pitfalls (and quick fixes)<a class="headerlink" href="#common-pitfalls-and-quick-fixes" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>Noisy derivative</strong> → add a small <span class="math notranslate nohighlight">\(\tau_d\)</span>, consider pre-filtering measurement <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
 <li><p><strong>Sluggish after saturation</strong> → lower <span class="math notranslate nohighlight">\(K_i\)</span>, reduce <span class="math notranslate nohighlight">\(T_{\text{aw}}\)</span>, or widen limits if physically valid.</p></li>
@@ -748,15 +1120,24 @@ These are aggressive; back off for robustness.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-loop-and-the-error-signal">1. Feedback loop and the error signal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pid-law-time-and-laplace-domains">2. PID law (time and Laplace domains)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#closed-loop-transfer-functions">3. Closed-loop transfer functions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-pid-derivative-filtering-and-anti-windup">4. Practical PID: derivative filtering and anti-windup</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-time-implementation-ready-to-run">5. Discrete-time implementation (ready to run)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant-no-scipy-needed">6. Worked example: first-order plant (no SciPy needed)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">7. A simple manual tuning recipe</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">8. Discrete PID you can paste into projects</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">9. Common pitfalls (and quick fixes)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proportional-integral-derivative-pid-control-structure">1. Proportional-Integral-Derivative (PID) Control Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfer-function-representation">2. Transfer Function Representation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-of-proportional-only-control">3. Analysis of Proportional-Only Control</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#effect-of-integral-action">4. Effect of Integral Action</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#effect-of-derivative-action">5. Effect of Derivative Action</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implementation-considerations">6. Practical Implementation Considerations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#worked-example-first-order-plant">7. Worked Example: First-Order Plant</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interactive-simulation-example">8. Interactive Simulation Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experiment-understanding-p-i-d-effects-on-a-second-order-plant">9. Experiment: Understanding P, I, D effects on a second-order plant</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-proportional-only-control">Step 1: Proportional-only control</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-adding-integral-action-pi-control">Step 2: Adding integral action (PI control)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-adding-derivative-action-full-pid">Step 3: Adding derivative action (full PID)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-frequency-domain-analysis">Step 4: Frequency domain analysis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-manual-tuning-recipe">10. A simple manual tuning recipe</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discrete-pid-you-can-paste-into-projects">11. Discrete PID you can paste into projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls-and-quick-fixes">12. Common pitfalls (and quick fixes)</a></li>
 </ul>
   </nav></div>
 
